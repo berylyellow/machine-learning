@@ -1,0 +1,39 @@
+import numpy as np
+import operator
+
+def createDataset():
+    group = np.array([[5,115],[7,106],[9,120],[4,148],[56,11],[66,9],[70,8],[80,5]])
+    labels = ['动作片','动作片','动作片','动作片','爱情片','爱情片','爱情片','爱情片']
+    return group,labels
+
+def classify(input, dataSet, labels, k):
+    dataSetSize = dataSet.shape[0]   #数组行数
+    ###计算欧氏距离
+    diff = np.tile(input, (dataSetSize,1)) - dataSet
+    sqdiff = diff ** 2
+    sqDistance = sqdiff.sum(axis = 1)  #行向量相加
+    distance = sqDistance ** 0.5
+    sortdistanceIndex = distance.argsort() #返回distance中元素从小到大排序后的索引
+    classcount = {}
+    for i in range(k):
+        getlabel = labels[sortdistanceIndex[i]]
+        print("第%d个获取的label=%s" % (i,getlabel))
+        ###对选取的k个样本所属的类别个数进行统计
+        classcount[getlabel] = classcount.get(getlabel,0) + 1  #字典的get()方法,返回指定键的值,如果指定键的值不在字典中则返回0。
+    sortedclasscount = sorted(classcount.items(),key=operator.itemgetter(1),reverse=True)
+    """
+    maxCount = 0
+    for key,value in classCount.items():
+        if value > maxCount:
+            maxCount = value
+            classes = key
+    """
+    print("sortedclasscount:",sortedclasscount)
+    return sortedclasscount[0][0]
+
+
+if __name__ == "__main__":
+    group,labels = createDataset()
+    testdata = [20,125]
+    predict_class = classify(testdata,group,labels,4)
+    print(predict_class)
